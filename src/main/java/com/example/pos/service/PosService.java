@@ -3,7 +3,7 @@ package com.example.pos.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;  // Add this import statement
+import java.io.IOException;
 
 @Service
 public class PosService {
@@ -16,7 +16,7 @@ public class PosService {
     }
 
     public String uploadProductImage(MultipartFile file, String bucketName, String key) throws IOException {
-        // Call the uploadImage method of S3Service
-        return s3Service.uploadImage(file, bucketName, key);
+        // Call the uploadImage method of S3Service with correct arguments
+        return s3Service.uploadImage(key, file.getBytes());
     }
 }
