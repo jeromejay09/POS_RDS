@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Transaction Detail</title>
+</head>
+<body>
+<h1>Transaction Complete</h1>
+<p>Product ID: <span th:text="${transaction.productId}"></span></p>
+<p>Quantity: <span th:text="${transaction.quantity}"></span></p>
+<p>Total Amount: $<span th:text="${transaction.totalAmount}"></span></p>
+<p>Date: <span th:text="${#dates.format(transaction.date, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+</body>
+</html>

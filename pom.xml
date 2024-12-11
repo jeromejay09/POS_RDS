@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!-- Basic POM Information -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Your project coordinates -->
+    <groupId>com.example</groupId>
+    <artifactId>pos-system</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <!-- Parent Spring Boot Version -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.10</version> <!-- Use the correct Spring Boot version here -->
+    </parent>
+
+    <!-- Dependencies -->
+    <dependencies>
+        <!-- Spring Boot Web Dependency -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>2.7.10</version> <!-- Spring Boot version -->
+        </dependency>
+
+        <!-- Spring Boot Data JPA Dependency for RDS -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>2.7.10</version> <!-- Spring Boot version -->
+        </dependency>
+
+        <!-- AWS SDK S3 Dependency -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>2.20.5</version> <!-- Use the appropriate version -->
+        </dependency>
+
+        <!-- AWS SDK RDS Dependency -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>rds</artifactId>
+            <version>2.20.5</version> <!-- Use the appropriate version -->
+        </dependency>
+
+        <!-- Spring Boot Test Dependency for testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <version>2.7.10</version> <!-- Spring Boot version -->
+        </dependency>
+
+        <!-- H2 Database for testing purposes (can be replaced with your DB, e.g., MySQL for RDS) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+            <version>1.4.200</version> <!-- H2 database version -->
+        </dependency>
+
+        <!-- MySQL Connector Dependency (needed for RDS or your database setup) -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.30</version> <!-- Adjust to your preferred version -->
+        </dependency>
+
+        <!-- Spring Boot DevTools for local development (optional) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <version>2.7.10</version> <!-- Spring Boot version -->
+        </dependency>
+    </dependencies>
+
+    <!-- Plugin configuration for Maven build -->
+    <build>
+        <plugins>
+            <!-- Spring Boot Maven Plugin -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.7.10</version> <!-- Spring Boot version -->
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
