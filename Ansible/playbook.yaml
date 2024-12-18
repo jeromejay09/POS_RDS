@@ -26,4 +26,13 @@
       args:
         executable: /bin/bash
 
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Maven
+      apt:
+        name: maven
+        state: present
+
    
