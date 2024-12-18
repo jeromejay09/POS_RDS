@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('Run Ansible') {
             steps {
-                sh 'sh 'cd Ansible && ansible-playbook -i localhost my-playbook.yaml, --connection=local''
+                sh 'cd Ansible && ansible-playbook -i localhost my-playbook.yaml, --connection=local'
             }
         }
         
