@@ -147,6 +147,3 @@ pipeline {
         }
     }
 }
-
-sonarqube token: squ_8df240feb72a7b17be71e9b97624e8424cffa88b
-ECR review
