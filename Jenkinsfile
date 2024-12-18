@@ -16,7 +16,7 @@ pipeline {
             steps {
                 sh '''
                     cd Ansible
-                    ansible-playbook -i localhost playbook.yaml --connection=local
+                    ansible-playbook -i localhost, playbook.yaml --connection=local
                 '''
             }
         }
@@ -24,7 +24,7 @@ pipeline {
         
         stage('Checkout') {
             steps {
-                git 'https://github.com/jeromejay09/POS_RDS.git'
+                git branch: 'main', url: 'https://github.com/jeromejay09/POS_RDS.git'
             }
         }
 
