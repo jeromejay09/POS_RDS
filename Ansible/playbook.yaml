@@ -1,0 +1,29 @@
+---
+- name: Install required tools for pipeline
+  hosts: localhost
+  become: yes
+
+  tasks:
+    - name: Install git-secrets
+      shell: |
+        if ! command -v git-secrets &> /dev/null; then
+          echo "Installing git-secrets..."
+          git clone https://github.com/awslabs/git-secrets.git
+          cd git-secrets && sudo make install
+        fi
+      args:
+        executable: /bin/bash
+
+    - name: Install Trivy
+      shell: |
+        if ! command -v trivy &> /dev/null; then
+          echo "Installing Trivy..."
+          sudo apt-get update -y
+          sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/download/v0.44.0/trivy_0.44.0_Linux-64bit.deb
+          sudo dpkg -i trivy_0.44.0_Linux-64bit.deb
+        fi
+      args:
+        executable: /bin/bash
+
+   

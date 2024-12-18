@@ -1,0 +1,30 @@
+
+---
+- name: Install and configure tools on Kubernetes nodes
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+
+    - name: Install Trivy
+      shell: |
+        wget -qO trivy.deb https://github.com/aquasecurity/trivy/releases/download/v0.44.0/trivy_0.44.0_Linux-64bit.deb
+        dpkg -i trivy.deb
+      args:
+        creates: /usr/local/bin/trivy
+
+    - name: Install git-secrets
+      shell: |
+        if ! git secrets --version &> /dev/null; then
+          git clone https://github.com/awslabs/git-secrets.git /tmp/git-secrets
+          cd /tmp/git-secrets && make install
+        fi
+      args:
+        creates: /usr/local/bin/git-secrets
