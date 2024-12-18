@@ -55,7 +55,7 @@ pipeline {
         stage('Static Code Analysis with SonarQube') {
             steps {
                 script {
-                    sh 'mvn sonar:sonar -Dsonar.host.url=3.27.135.42:9000 -Dsonar.login=$SONARQUBE_TOKEN'
+                    sh 'mvn sonar:sonar -Dsonar.host.url=http://3.27.135.42:9000 -Dsonar.login=$SONARQUBE_TOKEN'
                 }
             }
         }
