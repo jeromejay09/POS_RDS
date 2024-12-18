@@ -14,7 +14,10 @@ pipeline {
     stages {
         stage('Run Ansible') {
             steps {
-                sh 'cd Ansible && ls && ansible-playbook -i localhost /var/jenkins_home/workspace/POS-RDS-S3/Ansible/playbook.yaml, --connection=local'
+                sh '''
+                    cd Ansible
+                    ansible-playbook -i localhost playbook.yaml --connection=local
+                '''
             }
         }
         
