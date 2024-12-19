@@ -56,6 +56,7 @@ pipeline {
             steps {
                 script {
                     sh '''
+                        mvn clean install
                         mvn sonar:sonar \
                             -Dsonar.host.url=http://3.26.22.65:9000 \
                             -Dsonar.login=$SONARQUBE_TOKEN \
