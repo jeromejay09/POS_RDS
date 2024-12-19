@@ -57,7 +57,7 @@ pipeline {
                 script {
                     sh '''
                         mvn sonar:sonar \
-                            -Dsonar.host.url=http://3.27.135.42:9000 \
+                            -Dsonar.host.url=http://3.26.22.65:9000 \
                             -Dsonar.login=$SONARQUBE_TOKEN \
                             -Dsonar.java.binaries=target/classes
                     '''
