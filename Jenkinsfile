@@ -158,7 +158,10 @@ pipeline {
             steps {
                 withDockerRegistry([credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/']) {
                     // Enable Docker Content Trust (DCT) to sign the image before pushing
-                    sh 'DOCKER_CONTENT_TRUST=1 docker push $DOCKER_IMAGE'
+                    sh """
+                    export DOCKER_CONTENT_TRUST=1
+                    docker push $DOCKER_IMAGE
+                    """
                 }
             }
         }
