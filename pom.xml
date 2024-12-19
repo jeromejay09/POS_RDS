@@ -19,6 +19,10 @@
         <version>2.7.10</version> <!-- Use the correct Spring Boot version here -->
     </parent>
 
+    <properties>
+        <sonar.java.binaries>target/classes</sonar.java.binaries>
+    </properties>
+
     <!-- Dependencies -->
     <dependencies>
         <!-- Spring Boot Web Dependency -->
@@ -124,5 +128,8 @@
             </plugin>
         </plugins>
     </build>
+
+
+
 
 </project>
