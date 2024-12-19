@@ -110,7 +110,7 @@ pipeline {
                             export GPG_TTY=$(tty)
                             export GPG_KEY_PATH=$WORKSPACE/gpg/private.key
                             export GPG_PASSPHRASE="$GPG_PASSPHRASE"
-                            gpg --import $GPG_KEY_PATH
+                       
                             # Now use the GPG key to sign your file
                             gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" -o target/pos-system-1.0.0.jar -a --detach-sig target/pos-system-1.0.0.jar
                         '''
