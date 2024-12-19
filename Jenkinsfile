@@ -125,7 +125,10 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+                sh """
+                sudo chmod 777 /var/run/docker.sock
+                docker build -t $DOCKER_IMAGE .
+                """
             }
         }
 
