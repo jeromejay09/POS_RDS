@@ -91,19 +91,28 @@ pipeline {
             }
         }
 
-        stage('GPG Sign the JAR File') {
+        stage('Setup GPG Key and Sign') {
             steps {
-                script {
-                    // Sign the JAR file using GPG
-                    sh '''
-                        export GPG_KEY_PATH="${WORKSPACE}/gpg/private.key"
-                        echo "$GPG_KEY" > $GPG_KEY_PATH
-                        gpg --import $GPG_KEY_PATH
-                        gpg --batch --yes --passphrase "$GPG_PASSPHRASE" -o target/pos-system-1.0.0.jar -a --detach-sig target/pos-system-1.0.0.jar
-                    '''
+                // Use the Secret File credential containing the GPG private key
+                withCredentials([file(credentialsId: 'gpg-private-key-id', variable: 'GPG_PRIVATE_KEY')]) {
+                    script {
+                        // The GPG key will be temporarily available at $GPG_PRIVATE_KEY
+                        // If you need to use it directly, you can pass it to the gpg command
+                        sh '''
+                            mkdir -p $WORKSPACE/gpg
+                            cp $GPG_PRIVATE_KEY $WORKSPACE/gpg/private.key
+                            export GPG_KEY_PATH=$WORKSPACE/gpg/private.key
+                            gpg --import $GPG_KEY_PATH
+                            # Now use the GPG key to sign your file
+                            gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" -o target/pos-system-1.0.0.jar -a --detach-sig target/pos-system-1.0.0.jar
+                        '''
+                    }
                 }
             }
         }
+
+
+        
 
         stage('Build Docker Image') {
             steps {
