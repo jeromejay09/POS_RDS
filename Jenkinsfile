@@ -148,7 +148,7 @@ pipeline {
             steps {
                 // This step is needed to sign the image using Docker Content Trust (DCT)
                 sh """
-                    docker trust sign $DOCKER_IMAGE
+                    echo $GPG_PASSPHRASE | docker trust sign --passphrase-stdin $DOCKER_IMAGE
                 """
             }
         }
