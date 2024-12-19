@@ -2,6 +2,8 @@ pipeline {
     agent any
 
     environment {
+        DOCKER_USERNAME = ''
+        DOCKER_PASSWORD = ''
         DOCKER_IMAGE = 'jeromejay09/demo-app:pos-1.0'
         SONARQUBE_TOKEN = credentials('sonarqube-token')  // SonarQube token for static analysis
         CHECKSTYLE_CONFIG = 'checkstyle.xml'  // Path to Checkstyle config file
@@ -44,8 +46,8 @@ pipeline {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
                         sh '''
                             # Retrieve the Docker Hub credentials from AWS Secrets Manager
-                            DOCKER_USERNAME=$(aws secretsmanager get-secret-value --secret-id $AWS_SECRETS_MANAGER --query 'SecretString' --output text | jq -r .username)
-                            DOCKER_PASSWORD=$(aws secretsmanager get-secret-value --secret-id $AWS_SECRETS_MANAGER --query 'SecretString' --output text | jq -r .password)
+                            export DOCKER_USERNAME=$(aws secretsmanager get-secret-value --secret-id $AWS_SECRETS_MANAGER --query 'SecretString' --output text | jq -r .username)
+                            export DOCKER_PASSWORD=$(aws secretsmanager get-secret-value --secret-id $AWS_SECRETS_MANAGER --query 'SecretString' --output text | jq -r .password)
                         '''
                     }
                 }
@@ -135,7 +137,7 @@ pipeline {
         stage('Trivy Security Check') {
             steps {
                 // Run Trivy security scan on the built Docker image
-                sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL $DOCKER_IMAGE --username $DOCKER_USERNAME --password $DOCKER_PASSWORD'
+                sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL $DOCKER_IMAGE --username ${env.DOCKER_USERNAME} --password ${env.DOCKER_PASSWORD}'
             }
         }
 
