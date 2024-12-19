@@ -94,7 +94,7 @@ pipeline {
         stage('Setup GPG Key and Sign') {
             steps {
                 // Use the Secret File credential containing the GPG private key
-                withCredentials([file(credentialsId: 'gpg-private-key-id', variable: 'GPG_PRIVATE_KEY')]) {
+                withCredentials([file(credentialsId: 'gpg-private-key', variable: 'GPG_PRIVATE_KEY')]) {
                     script {
                         // The GPG key will be temporarily available at $GPG_PRIVATE_KEY
                         // If you need to use it directly, you can pass it to the gpg command
