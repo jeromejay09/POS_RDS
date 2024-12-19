@@ -101,6 +101,8 @@ pipeline {
                         // If you need to use it directly, you can pass it to the gpg command
                         sh '''
                             mkdir -p $WORKSPACE/gpg
+                            sudo chown -R jenkins:jenkins $WORKSPACE/gpg
+                            sudo chmod -R 755 $WORKSPACE/gpg
                             cp $GPG_PRIVATE_KEY $WORKSPACE/gpg/private.key
                             export GPG_TTY=$(tty)
                             export GPG_KEY_PATH=$WORKSPACE/gpg/private.key
