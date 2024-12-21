@@ -66,7 +66,7 @@ pipeline {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
                         // Retrieve the private key from AWS Secrets Manager
                         def privateKey = sh(script: '''
-                            aws secretsmanager get-secret-value --secret-id docker-signing-private-key --query 'SecretString' --region ap-southeast-2 --output text
+                            aws secretsmanager get-secret-value --secret-id docker-signing-private-key2 --query 'SecretString' --region ap-southeast-2 --output text
                         ''', returnStdout: true).trim()
         
                         // You can then store this in a file for Docker to use, if needed
