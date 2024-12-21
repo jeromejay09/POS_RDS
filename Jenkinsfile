@@ -172,24 +172,22 @@ pipeline {
         }
 
 
-      //  stage('Sign Docker Image') {
-      //      steps {
-      //          // This step is needed to sign the image using Docker Content Trust (DCT)
-     //           sh """
-      //              export DOCKER_CONTENT_TRUST=1
-     //               docker trust sign $DOCKER_IMAGE
-      //          """
-      //      }
-     ///   }
+        stage('Sign Docker Image') {
+            steps {
+                // This step is needed to sign the image using Docker Content Trust (DCT)
+                sh """
+                    export DOCKER_CONTENT_TRUST=1
+                    docker trust sign $DOCKER_IMAGE
+                """
+            }
+        }
 
         stage('Push Docker Image') {
             steps {
                 withDockerRegistry([credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/']) {
                     // Enable Docker Content Trust (DCT) to sign the image before pushing
                     sh """
-                    docker trust key load docker-signing-private.key
-                    export DOCKER_CONTENT_TRUST=1
-                    docker trust sign $DOCKER_IMAGE
+                    export DOCKER_CONTENT_TRUST=0
                     docker push $DOCKER_IMAGE
                     """
                 }
