@@ -9,7 +9,7 @@ pipeline {
         CHECKSTYLE_CONFIG = 'checkstyle.xml'  // Path to Checkstyle config file
         GPG_KEY = credentials('gpg-private-key')  // GPG private key for signing
         GPG_PASSPHRASE = credentials('gpg-passphrase')  // GPG passphrase
-        AWS_SECRETS_MANAGER = 'dockerhub-credentials'  // Name of the AWS Secrets Manager secret
+        AWS_SECRETS_MANAGER = 'docker-registry-credentials'  // Name of the AWS Secrets Manager secret
         DOCKER_CONTENT_TRUST = '1'  // Enable Docker Content Trust (DCT)
     }
 
@@ -42,17 +42,44 @@ pipeline {
         stage('Retrieve AWS Secrets') {
             steps {
                 script {
-                    // Retrieve secrets from AWS Secrets Manager (e.g., Docker Hub credentials)
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
-                        sh '''
-                            # Retrieve the Docker Hub credentials from AWS Secrets Manager
-                            export DOCKER_USERNAME=$(aws secretsmanager get-secret-value --secret-id $AWS_SECRETS_MANAGER --query 'SecretString' --output text | jq -r .username)
-                            export DOCKER_PASSWORD=$(aws secretsmanager get-secret-value --secret-id $AWS_SECRETS_MANAGER --query 'SecretString' --output text | jq -r .password)
-                        '''
+                        // Retrieve the Docker Hub credentials from AWS Secrets Manager
+                        def dockerCredentials = sh(script: '''
+                            aws secretsmanager get-secret-value --secret-id docker-registry-credentials --query 'SecretString' --region ap-southeast-2 --output text
+                        ''', returnStdout: true).trim()
+        
+                        // Parse the credentials from the JSON response
+                        def username = sh(script: "echo '${dockerCredentials}' | jq -r .username", returnStdout: true).trim()
+                        def password = sh(script: "echo '${dockerCredentials}' | jq -r .password", returnStdout: true).trim()
+        
+                        // Set the environment variables for use in later stages
+                        env.DOCKER_USERNAME = username
+                        env.DOCKER_PASSWORD = password
                     }
                 }
             }
         }
+
+        stage('Retrieve Docker Signing Key') {
+            steps {
+                script {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                        // Retrieve the private key from AWS Secrets Manager
+                        def privateKey = sh(script: '''
+                            aws secretsmanager get-secret-value --secret-id docker-signing-private-key --query 'SecretString' --output text
+                        ''', returnStdout: true).trim()
+        
+                        // You can then store this in a file for Docker to use, if needed
+                        writeFile(file: 'docker-signing-private.key', text: privateKey)
+                        
+                        // Set an environment variable to reference the key if needed
+                        env.DOCKER_SIGNING_PRIVATE_KEY_PATH = "${WORKSPACE}/docker-signing-private.key"
+                    }
+                }
+            }
+        }
+
+
 
         stage('Static Code Analysis with SonarQube') {
             steps {
@@ -159,6 +186,7 @@ pipeline {
                 withDockerRegistry([credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/']) {
                     // Enable Docker Content Trust (DCT) to sign the image before pushing
                     sh """
+                    docker trust key load docker-signing-private.key
                     export DOCKER_CONTENT_TRUST=1
                     docker trust sign $DOCKER_IMAGE
                     docker push $DOCKER_IMAGE
