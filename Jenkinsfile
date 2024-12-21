@@ -71,6 +71,8 @@ pipeline {
         
                         // You can then store this in a file for Docker to use, if needed
                         writeFile(file: 'docker-signing-private.key', text: privateKey)
+                        // Set permissions on the private key file to be readable only by the owner
+                        sh 'chmod 600 docker-signing-private.key'
                         
                         // Set an environment variable to reference the key if needed
                         env.DOCKER_SIGNING_PRIVATE_KEY_PATH = "${WORKSPACE}/docker-signing-private.key"
