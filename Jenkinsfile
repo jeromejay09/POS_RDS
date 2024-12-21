@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_USERNAME = ''
-        DOCKER_PASSWORD = ''
+        
         DOCKER_IMAGE = 'jeromejay09/demo-app:pos-1.0'
         SONARQUBE_TOKEN = credentials('sonarqube-token')  // SonarQube token for static analysis
         CHECKSTYLE_CONFIG = 'checkstyle.xml'  // Path to Checkstyle config file
