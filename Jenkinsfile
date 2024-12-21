@@ -144,15 +144,15 @@ pipeline {
         }
 
 
-        stage('Sign Docker Image') {
-            steps {
-                // This step is needed to sign the image using Docker Content Trust (DCT)
-                sh """
-                    export DOCKER_CONTENT_TRUST=1
-                    docker trust sign $DOCKER_IMAGE
-                """
-            }
-        }
+      //  stage('Sign Docker Image') {
+      //      steps {
+      //          // This step is needed to sign the image using Docker Content Trust (DCT)
+     //           sh """
+      //              export DOCKER_CONTENT_TRUST=1
+     //               docker trust sign $DOCKER_IMAGE
+      //          """
+      //      }
+     ///   }
 
         stage('Push Docker Image') {
             steps {
@@ -160,19 +160,20 @@ pipeline {
                     // Enable Docker Content Trust (DCT) to sign the image before pushing
                     sh """
                     export DOCKER_CONTENT_TRUST=1
+                    docker trust sign $DOCKER_IMAGE
                     docker push $DOCKER_IMAGE
                     """
                 }
             }
         }
 
-        stage('Create Pods and Services from the manifest file') {
-            steps {
-                sh 'aws eks update-kubeconfig --name my-cluster-eks --region ap-southeast-1'
-                sh 'kubectl create -f pos-k8s.yaml'
+    //    stage('Create Pods and Services from the manifest file') {
+    //        steps {
+     //           sh 'aws eks update-kubeconfig --name my-cluster-eks --region ap-southeast-1'
+    //            sh 'kubectl create -f pos-k8s.yaml'
                                
-            }
-        }
+    //        }
+    //    }
 
 
         
