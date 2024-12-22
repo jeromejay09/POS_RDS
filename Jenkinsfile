@@ -171,20 +171,33 @@ pipeline {
             }
         }
 
-        stage('Sign Docker Image') {
+       stage('Sign Docker Image') {
             steps {
                 withCredentials([file(credentialsId: 'gpg-private-key', variable: 'GPG_PRIVATE_KEY')]) {
+                    script {
+                        // Import the GPG key
+                        sh "gpg --import $GPG_PRIVATE_KEY"
+        
+                        // Optionally, export the GPG private key to ensure it is used by Docker
+                        sh """
+                            export GPG_KEY=$(gpg --list-secret-keys --keyid-format LONG | grep '^sec' | awk '{print $2}' | sed 's/\/.*//')
+                            echo "GPG key ID: $GPG_KEY"
+                        """
+                    }
+        
+                    // Save and sign the image
                     sh """
                         docker save $DOCKER_IMAGE -o image.tar
-                        gpg --import $GPG_PRIVATE_KEY
                         echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --output image.tar.sig image.tar
                         docker load < image.tar
+                        docker trust sign $DOCKER_IMAGE --key $GPG_KEY
                         docker push $DOCKER_IMAGE
                         aws s3 cp image.tar.sig s3://pos-system-bucket2/image.tar.sig
                     """
                 }
             }
         }
+
 
 
 //        stage('Sign Docker Image') {
