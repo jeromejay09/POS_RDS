@@ -174,7 +174,8 @@ pipeline {
        stage('Sign Docker Image') {
             steps {
                 withCredentials([file(credentialsId: 'gpg-private-key', variable: 'GPG_PRIVATE_KEY'),
-                                 usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                                 usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD'),
+                                 string(credentialsId: 'docker-repo-passphrase', variable: 'GPG_PASSPHRASE')]) {
                     script {
                         // Import the GPG key
                         sh "gpg --import $GPG_PRIVATE_KEY"
@@ -195,7 +196,7 @@ pipeline {
                         echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --output image.tar.sig image.tar
                         docker load < image.tar
                         export DOCKER_CONTENT_TRUST=1  # Enable Docker Content Trust for signing
-                        docker trust sign $DOCKER_IMAGE  # Sign the image
+                        echo "$GPG_PASSPHRASE" | docker trust sign $DOCKER_IMAGE  # Sign the image
                         docker push $DOCKER_IMAGE  # Push the signed image to Docker Hub
                         aws s3 cp image.tar.sig s3://pos-system-bucket2/image.tar.sig  # Upload signature to S3
                     """
