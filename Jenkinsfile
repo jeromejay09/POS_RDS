@@ -180,9 +180,10 @@ pipeline {
         
                         // Optionally, export the GPG private key to ensure it is used by Docker
                         sh """
-                            export GPG_KEY=\$(gpg --list-secret-keys --keyid-format LONG | grep '^sec' | awk '{print \$2}' | sed 's/\/.*//')
+                            export GPG_KEY=\$(gpg --list-secret-keys --keyid-format LONG | grep '^sec' | awk '{print \\$2}' | sed 's/\\/.*//')
                             echo "GPG key ID: \$GPG_KEY"
                         """
+
 
 
                     }
