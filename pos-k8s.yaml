@@ -24,6 +24,11 @@ spec:
       limits:
         memory: "512Mi"
         cpu: "500m"
+    env:
+    - name: AWS_ACCESS_KEY_ID
+      value: AKIAW3MEEISIVY5UWJ6X
+    - name: AWS_SECRET_ACCESS_KEY
+      value: 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
   imagePullSecrets:
     - name: my-registry-secret
 
