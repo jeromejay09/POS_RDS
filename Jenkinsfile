@@ -171,68 +171,29 @@ pipeline {
             }
         }
 
-       stage('Sign Docker Image') {
+     
+
+        stage('Sign Docker Image') {
             steps {
-                withCredentials([file(credentialsId: 'gpg-private-key', variable: 'GPG_PRIVATE_KEY'),
-                                 usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD'),
-                                 string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')]) {
-                    script {
-                        // Import the GPG key
-                        sh "gpg --import $GPG_PRIVATE_KEY"
-                        
-                        // Optionally, export the GPG private key to ensure it is used by Docker
-                        sh '''
-                            export GPG_KEY=\$(gpg --list-secret-keys --keyid-format LONG | grep '^sec' | awk '{print \\\\$2}' | sed 's/\\/.*//')
-                            echo "GPG key ID: \${GPG_KEY}"
-                        '''
-        
-                        // Docker Hub login
-                        sh "echo \$DOCKER_PASSWORD | docker login --username \$DOCKER_USERNAME --password-stdin"
-                    }
-        
-                    // Save, sign, and push the image
+                // This step is needed to sign the image using Docker Content Trust (DCT)
+                sh """
+                    export DOCKER_CONTENT_TRUST=1
+                    docker trust sign $DOCKER_IMAGE
+                """
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withDockerRegistry([credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/']) {
+                    // Enable Docker Content Trust (DCT) to sign the image before pushing
                     sh """
-                        docker save $DOCKER_IMAGE -o image.tar
-                        echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --output image.tar.sig image.tar
-                        docker load < image.tar
-                        export DOCKER_CONTENT_TRUST=1  # Enable Docker Content Trust for signing
-        
-                        # Save the passphrase to a file to avoid interactive prompt
-                        echo "$GPG_PASSPHRASE" > passphrase.txt
-                        docker trust sign $DOCKER_IMAGE --passphrase-file passphrase.txt  # Sign the image using the passphrase file
-                        docker push $DOCKER_IMAGE  # Push the signed image to Docker Hub
-                        aws s3 cp image.tar.sig s3://pos-system-bucket2/image.tar.sig  # Upload signature to S3
+                    export DOCKER_CONTENT_TRUST=0
+                    docker push $DOCKER_IMAGE
                     """
                 }
             }
         }
-
-
-
-
-
-
-//        stage('Sign Docker Image') {
-//            steps {
-//                // This step is needed to sign the image using Docker Content Trust (DCT)
-//                sh """
-//                    export DOCKER_CONTENT_TRUST=1
-//                    docker trust sign $DOCKER_IMAGE
-//                """
-//            }
-//        }
-
-//        stage('Push Docker Image') {
-//            steps {
-//                withDockerRegistry([credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/']) {
-//                    // Enable Docker Content Trust (DCT) to sign the image before pushing
-//                    sh """
- //                   export DOCKER_CONTENT_TRUST=0
-//                    docker push $DOCKER_IMAGE
- //                   """
-     //           }
- ///           }
- //       }
 
     //    stage('Create Pods and Services from the manifest file') {
     //        steps {
