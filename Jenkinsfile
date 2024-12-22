@@ -171,7 +171,7 @@ pipeline {
             }
         }
 
-       sstage('Sign Docker Image') {
+       stage('Sign Docker Image') {
             steps {
                 withCredentials([file(credentialsId: 'gpg-private-key', variable: 'GPG_PRIVATE_KEY'),
                                  usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD'),
