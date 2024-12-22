@@ -173,24 +173,23 @@ pipeline {
 
        stage('Sign Docker Image') {
             steps {
-                withCredentials([file(credentialsId: 'gpg-private-key', variable: 'GPG_PRIVATE_KEY')]) {
+                withCredentials([file(credentialsId: 'gpg-private-key', variable: 'GPG_PRIVATE_KEY'),
+                                 usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     script {
                         // Import the GPG key
                         sh "gpg --import $GPG_PRIVATE_KEY"
-        
+                
                         // Optionally, export the GPG private key to ensure it is used by Docker
-                       sh '''
-                            export GPG_KEY=\$(gpg --list-secret-keys --keyid-format LONG | grep '^sec' | awk '{print \\$2}' | sed 's/\\/.*//')
+                        sh '''
+                            export GPG_KEY=$(gpg --list-secret-keys --keyid-format LONG | grep '^sec' | awk '{print \\$2}' | sed 's/\\/.*//')
                             echo "GPG key ID: \${GPG_KEY}"
                         '''
-
-
-
-
-
+                
+                        // Docker Hub login
+                        sh "echo \$DOCKER_PASSWORD | docker login --username \$DOCKER_USERNAME --password-stdin"
                     }
-        
-                    // Save and sign the image
+                
+                    // Save, sign, and push the image
                     sh """
                         docker save $DOCKER_IMAGE -o image.tar
                         echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --output image.tar.sig image.tar
@@ -202,6 +201,7 @@ pipeline {
                 }
             }
         }
+
 
 
 
