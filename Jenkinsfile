@@ -88,7 +88,7 @@ pipeline {
                     sh '''
                         mvn clean install
                         mvn sonar:sonar \
-                            -Dsonar.host.url=http://3.107.238.86:9000 \
+                            -Dsonar.host.url=http://54.252.200.26:9000 \
                             -Dsonar.login=$SONARQUBE_TOKEN \
                             -Dsonar.java.binaries=target/classes
                     '''
