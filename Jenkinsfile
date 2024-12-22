@@ -175,7 +175,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'gpg-private-key', variable: 'GPG_PRIVATE_KEY'),
                                  usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD'),
-                                 string(credentialsId: 'docker-repo-passphrase', variable: 'GPG_PASSPHRASE')]) {
+                                 string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')]) {
                     script {
                         // Import the GPG key
                         sh "gpg --import $GPG_PRIVATE_KEY"
