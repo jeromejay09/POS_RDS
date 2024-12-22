@@ -174,7 +174,7 @@ pipeline {
        stage('Sign Docker Image') {
             steps {
                 withCredentials([file(credentialsId: 'gpg-private-key', variable: 'GPG_PRIVATE_KEY'),
-                                 usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                                 usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     script {
                         // Import the GPG key
                         sh "gpg --import $GPG_PRIVATE_KEY"
@@ -185,7 +185,7 @@ pipeline {
                             echo "GPG key ID: \${GPG_KEY}"
                         '''
                 
-                        // Docker Hub login
+                        // r Hub login
                         sh "echo \$DOCKER_PASSWORD | docker login --username \$DOCKER_USERNAME --password-stdin"
                     }
                 
