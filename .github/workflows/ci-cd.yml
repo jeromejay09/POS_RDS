@@ -78,40 +78,36 @@ jobs:
     - name: Build Java Application
       run: mvn clean package -DskipTests
       
-    # Step 9: Build Java Application
     - name: Setup GPG Key and Sign
       run: |
-
-        gpgconf --status 2>&1 | grep -q "^gpg-agent.*RUNNING"
-        if [[ $? -ne 0 ]]; then
-          echo "GPG Agent not running! Starting..."
-          gpg-agent --daemon
-        fi
-        
-        # Create the GPG home directory and set permissions
+        # Create the GPG home directory
         mkdir -p ~/.gnupg
         chmod 700 ~/.gnupg
-
-        # Set GNUPGHOME environment variable
+    
+        # Set GNUPGHOME environment variable FIRST
         export GNUPGHOME=$(mktemp -d)
         chmod 700 "$GNUPGHOME"
-
-        # Import the GPG key (handling line endings with base64)
-        echo "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" | base64 -d | gpg --import
-
+    
+        # Start GPG Agent AFTER setting GNUPGHOME
+        gpg-agent --daemon
+    
+        # Import the GPG key
+        echo "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" | base64 -d | gpg --import --pinentry-mode loopback
+    
         # Check if the import was successful
         if [[ $? -ne 0 ]]; then
           echo "GPG key import failed!"
+          gpg --list-secret-keys # Debugging
           exit 1
         fi
-
-         # List imported keys (for debugging)
+    
+        # List imported keys (for debugging)
         gpg --list-secret-keys
-
-        # Sign the JAR - Use --default-key and ensure correct passphrase handling
+    
+        # Sign the JAR
         gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" --default-key $(gpg --list-secret-keys --with-colons | grep ^sec | cut -d: -f5) -o target/pos-system-1.0.0.jar -a --detach-sig target/pos-system-1.0.0.jar
-
-        #Clean up GPG Home
+    
+        #Clean up GPG Home (outside the conditional)
         rm -rf "$GNUPGHOME"
       shell: bash
       
