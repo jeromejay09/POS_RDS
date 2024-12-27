@@ -80,32 +80,32 @@ jobs:
       
     # Step 9: Build Java Application
     - name: Setup GPG Key and Sign
-        run: |
-          # Create the GPG home directory and set permissions
-          mkdir -p ~/.gnupg
-          chmod 700 ~/.gnupg
+      run: |
+        # Create the GPG home directory and set permissions
+        mkdir -p ~/.gnupg
+        chmod 700 ~/.gnupg
 
-          # Set GNUPGHOME environment variable
-          export GNUPGHOME=$(mktemp -d)
+        # Set GNUPGHOME environment variable
+        export GNUPGHOME=$(mktemp -d)
 
-          # Import the GPG key (handling line endings with base64)
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 -d | gpg --import
+        # Import the GPG key (handling line endings with base64)
+        echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 -d | gpg --import
 
-          # Check if the import was successful
-          if [[ $? -ne 0 ]]; then
-            echo "GPG key import failed!"
-            exit 1
-          fi
+        # Check if the import was successful
+        if [[ $? -ne 0 ]]; then
+          echo "GPG key import failed!"
+          exit 1
+        fi
 
-           # List imported keys (for debugging)
-          gpg --list-secret-keys
+         # List imported keys (for debugging)
+        gpg --list-secret-keys
 
-          # Sign the JAR - Use --default-key and ensure correct passphrase handling
-          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" --default-key $(gpg --list-secret-keys --with-colons | grep ^sec | cut -d: -f5) -o target/pos-system-1.0.0.jar -a --detach-sig target/pos-system-1.0.0.jar
+        # Sign the JAR - Use --default-key and ensure correct passphrase handling
+        gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" --default-key $(gpg --list-secret-keys --with-colons | grep ^sec | cut -d: -f5) -o target/pos-system-1.0.0.jar -a --detach-sig target/pos-system-1.0.0.jar
 
-          #Clean up GPG Home
-          rm -rf "$GNUPGHOME"
-        shell: bash
+        #Clean up GPG Home
+        rm -rf "$GNUPGHOME"
+      shell: bash
       
     # Step 10: Build Docker Image
     - name: Build Docker Image
