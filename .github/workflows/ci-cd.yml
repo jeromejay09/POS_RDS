@@ -78,12 +78,30 @@ jobs:
     - name: Build Java Application
       run: mvn clean package -DskipTests
 
-    # Step 9: Setup GPG Key and Sign
     - name: Setup GPG Key and Sign
       run: |
-        echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import
+        # Create the GPG home directory
+        mkdir -p ~/.gnupg
+    
+        # Set GNUPGHOME environment variable
+        export GNUPGHOME=$(mktemp -d)
+    
+        # Import the GPG key, handling potential line ending issues
+        echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 -d | gpg --import
+    
+        # Check if the import was successful
+        if [[ $? -ne 0 ]]; then
+          echo "GPG key import failed!"
+          exit 1
+        fi
+    
+        # Sign the JAR
         gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" -o target/pos-system-1.0.0.jar -a --detach-sig target/pos-system-1.0.0.jar
-
+    
+        #Clean up GPG Home
+        rm -rf "$GNUPGHOME"
+      shell: bash
+      
     # Step 10: Build Docker Image
     - name: Build Docker Image
       run: docker build -t $DOCKER_IMAGE .
