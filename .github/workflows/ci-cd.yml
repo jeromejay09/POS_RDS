@@ -89,7 +89,13 @@ jobs:
         chmod 700 "$GNUPGHOME"
     
         # Start GPG Agent AFTER setting GNUPGHOME
+        # Kill any existing agent
+        pkill gpg-agent
+
+        # Start GPG agent
         gpg-agent --daemon
+       
+
     
         # Import the GPG key
         echo "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" | base64 -d | gpg --import --pinentry-mode loopback
