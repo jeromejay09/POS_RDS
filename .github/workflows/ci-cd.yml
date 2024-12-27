@@ -78,38 +78,38 @@ jobs:
     - name: Build Java Application
       run: mvn clean package -DskipTests
 
-      - name: Setup GPG Key and Sign
-        run: |
-          # Create the GPG home directory
-          mkdir -p ~/.gnupg
-          chmod 700 ~/.gnupg
-      
-          # Set GNUPGHOME environment variable FIRST
-          export GNUPGHOME=$(mktemp -d)
-          chmod 700 "$GNUPGHOME"
-          
-          # Ensure GPG_TTY is set correctly to avoid tty errors
-          export GPG_TTY=/dev/null
-      
-          # Kill any running gpg-agent processes
-          pkill gpg-agent || true
-      
-          # Import the GPG key
-          echo "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" | base64 -d | gpg --batch --yes --pinentry-mode loopback --no-tty --no-use-agent --import
-      
-          # Check if the import was successful
-          if [[ $? -ne 0 ]]; then
-            echo "GPG key import failed!"
-            gpg --list-secret-keys # Debugging
-            exit 1
-          fi
-      
-          # Sign the JAR
-          gpg --batch --yes --pinentry-mode loopback --no-tty --passphrase "${{ secrets.GPG_PASSPHRASE }}" --default-key $(gpg --list-secret-keys --with-colons | grep ^sec | cut -d: -f5) -o target/pos-system-1.0.0.jar -a --detach-sig target/pos-system-1.0.0.jar
-      
-          # Clean up GPG Home (outside the conditional)
-          rm -rf "$GNUPGHOME"
-        shell: bash
+    - name: Setup GPG Key and Sign
+      run: |
+        # Create the GPG home directory
+        mkdir -p ~/.gnupg
+        chmod 700 ~/.gnupg
+    
+        # Set GNUPGHOME environment variable FIRST
+        export GNUPGHOME=$(mktemp -d)
+        chmod 700 "$GNUPGHOME"
+        
+        # Ensure GPG_TTY is set correctly to avoid tty errors
+        export GPG_TTY=/dev/null
+    
+        # Kill any running gpg-agent processes
+        pkill gpg-agent || true
+    
+        # Import the GPG key
+        echo "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" | base64 -d | gpg --batch --yes --pinentry-mode loopback --no-tty --no-use-agent --import
+    
+        # Check if the import was successful
+        if [[ $? -ne 0 ]]; then
+          echo "GPG key import failed!"
+          gpg --list-secret-keys # Debugging
+          exit 1
+        fi
+    
+        # Sign the JAR
+        gpg --batch --yes --pinentry-mode loopback --no-tty --passphrase "${{ secrets.GPG_PASSPHRASE }}" --default-key $(gpg --list-secret-keys --with-colons | grep ^sec | cut -d: -f5) -o target/pos-system-1.0.0.jar -a --detach-sig target/pos-system-1.0.0.jar
+    
+        # Clean up GPG Home (outside the conditional)
+        rm -rf "$GNUPGHOME"
+      shell: bash
 
 
     
