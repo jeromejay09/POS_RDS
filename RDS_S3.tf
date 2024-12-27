@@ -37,7 +37,7 @@ resource "aws_db_instance" "pos_system_db" {
 
 # Outputs
 output "rds_endpoint" {
-  value = aws_db_instance.pos_db.endpoint
+  value = aws_db_instance.pos_system_db.endpoint
 }
 
 output "s3_bucket_name" {
