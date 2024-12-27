@@ -34,7 +34,7 @@ jobs:
       run: |
         git secrets --scan
 
-    # Step 4: Retrieve AWS Secrets
+    # Step 4: Retrieve AWS Secret
     - name: Retrieve Docker Registry Credentials from AWS Secrets Manager
       id: aws-secrets
       uses: aws-actions/configure-aws-credentials@v2
