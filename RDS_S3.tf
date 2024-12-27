@@ -13,30 +13,28 @@ provider "aws" {
   region = "ap-southeast-1"  # Specify the region here
 }
 
-# RDS instance
-resource "aws_db_instance" "pos_system_db" {
+resource "aws_s3_bucket" "pos_bucket" {
+  bucket = "pos-system-bucket2"
+  acl    = "private"
+}
+
+resource "aws_db_instance" "pos_db" {
   allocated_storage    = 20
-  storage_type         = "gp2"
-  db_instance_class    = "db.t3.micro"
   engine               = "mysql"
   engine_version       = "8.0"
-  instance_identifier  = "pos-system-db"
+  instance_class       = "db.t2.micro"
+  name                 = "posdb"
   username             = "admin"
-  password             = "yourpassword"
-  db_name              = "posdb"
-  skip_final_snapshot  = true
-  multi_az             = false
-  publicly_accessible  = false
-
-  tags = {
-    Name = "POS System Database"
-  }
+  password             = "admin123"
+  parameter_group_name = "default.mysql8.0"
+  publicly_accessible  = true
 }
+
 
 output "rds_endpoint" {
   value = aws_db_instance.pos_system_db.endpoint
 }
 
 output "s3_bucket_name" {
-  value = aws_s3_bucket.pos_system_bucket.bucket
+  value = aws_s3_bucket.pos_system_bucket2.bucket
 }
