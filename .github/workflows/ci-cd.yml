@@ -87,7 +87,7 @@ jobs:
         export GNUPGHOME=$(mktemp -d)
     
         # Import the GPG key, handling potential line ending issues
-        echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 -d | gpg --import
+        echo "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" | base64 -d | gpg --import
     
         # Check if the import was successful
         if [[ $? -ne 0 ]]; then
