@@ -81,12 +81,20 @@ jobs:
     # Step 9: Build Java Application
     - name: Setup GPG Key and Sign
       run: |
+
+        gpgconf --status 2>&1 | grep -q "^gpg-agent.*RUNNING"
+        if [[ $? -ne 0 ]]; then
+          echo "GPG Agent not running! Starting..."
+          gpg-agent --daemon
+        fi
+        
         # Create the GPG home directory and set permissions
         mkdir -p ~/.gnupg
         chmod 700 ~/.gnupg
 
         # Set GNUPGHOME environment variable
         export GNUPGHOME=$(mktemp -d)
+        chmod 700 "$GNUPGHOME"
 
         # Import the GPG key (handling line endings with base64)
         echo "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" | base64 -d | gpg --import
