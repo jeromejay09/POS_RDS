@@ -4,7 +4,7 @@ provider "aws" {
 
 # S3 Bucket
 resource "aws_s3_bucket" "pos_bucket" {
-  bucket = "pos-system-bucket2"
+  bucket = "pos-system-bucket3"
 
   tags = {
     Name = "POS System Bucket"
