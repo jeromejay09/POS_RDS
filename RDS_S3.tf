@@ -10,7 +10,7 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-west-2"  # Specify the region here
+  region = "ap-southeast-1"  # Specify the region here
 }
 
 # RDS instance
