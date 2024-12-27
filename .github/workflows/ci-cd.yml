@@ -109,8 +109,8 @@ jobs:
         gpg --list-secret-keys
     
         # Sign the JAR
-        gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" --default-key $(gpg --list-secret-keys --with-colons | grep ^sec | cut -d: -f5) -o target/pos-system-1.0.0.jar -a --detach-sig target/pos-system-1.0.0.jar
-    
+        gpg --batch --yes --pinentry-mode loopback --no-tty --passphrase "${{ secrets.GPG_PASSPHRASE }}" --default-key $(gpg --list-secret-keys --with-colons | grep ^sec | cut -d: -f5) -o target/pos-system-1.0.0.jar -a --detach-sig target/pos-system-1.0.0.jar
+
         # Clean up GPG Home (outside the conditional)
         rm -rf "$GNUPGHOME"
       shell: bash
