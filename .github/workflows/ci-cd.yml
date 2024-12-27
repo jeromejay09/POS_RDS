@@ -80,6 +80,8 @@ jobs:
 
     - name: Setup GPG Key and Sign
       run: |
+      # Start GPG Agent
+        gpg-agent --daemon
         # Create the GPG home directory
         mkdir -p ~/.gnupg
     
