@@ -124,10 +124,18 @@ jobs:
         trivy image --exit-code 0 --severity HIGH,CRITICAL $DOCKER_IMAGE
 
     # Step 12: Sign Docker Image
-    - name: Sign Docker Image
+    - name: Set up Docker and GPG keys
       run: |
         export DOCKER_CONTENT_TRUST=1
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+    
+        # Optionally, import GPG key if needed
+        echo "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" | base64 -d | gpg --batch --yes --pinentry-mode loopback --no-tty --no-use-agent --import
+    
+    - name: Sign Docker Image
+      run: |
         docker trust sign $DOCKER_IMAGE
+
 
     # Step 13: Push Docker Image
     - name: Push Docker Image
